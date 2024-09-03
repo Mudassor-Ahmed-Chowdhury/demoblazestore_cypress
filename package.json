@@ -1,0 +1,21 @@
+{
+  "name": "package.json",
+  "version": "1.0.0",
+  "description": "Example project based on Cypress. The project contains UI tests for website: https://www.demoblaze.com/.",
+  "main": "index.js",
+  "scripts": {
+    "cy:run": "npx cypress run",
+    "test:demoblaze": "npx cypress run --spec cypress/e2e/demoblaze/**",
+    "test:booker": "npx cypress run --spec cypress/e2e/booker/**",
+    "cy:open": "npx cypress open",
+    "cy:record": "npx cypress run --record --key 0739ba64-ca45-4afc-90e2-f7b2fe7cfc4c",
+    "test:smoke": "npx cypress run --env grepTags=smoke --record --key 0739ba64-ca45-4afc-90e2-f7b2fe7cfc4c",
+    "test:regression": "npx cypress run --env grepTags=regression"
+  },
+
+  "homepage": "https://github.com/Mudassor-Ahmed-Chowdhury/demoblazestore_cypress",
+  "devDependencies": {
+    "@cypress/grep": "^3.1.0",
+    "@faker-js/faker": "^7.6.0"
+  }
+}
