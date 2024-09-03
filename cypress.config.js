@@ -1,8 +1,11 @@
-import { defineConfig } from 'cypress'
-
-export default defineConfig({
-  e2e: {
-    // Configure your E2E tests here
-    specPattern: "cypress/e2e/**/*.{cy,spec}.{js,ts}"
+module.exports = {
+  projectId: "t8t8wy",
+  env: {
+    bookerApiUrl: 'https://restful-booker.herokuapp.com'
   },
-})
+  e2e: {
+    setupNodeEvents(on, config) {
+      // implement node event listeners here
+    },
+  },
+};
