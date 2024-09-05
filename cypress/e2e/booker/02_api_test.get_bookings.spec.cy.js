@@ -1,82 +1,43 @@
-import {createBooking, getBookingByCheckin, getBookingByCheckout, getBookingByFirstname, getBookingById, getBookingByLastname, getBookingIds} from "../../service/bookingService"
-import {getBookingData} from "../../helper/dataGenerator"
+import {
+    createBooking, getBookingByCheckin, getBookingByCheckout, getBookingByFirstname,
+    getBookingById, getBookingByLastname, getBookingIds } from "../../service/bookingService";
+import { getBookingData } from "../../helper/dataGenerator";
 
+const createAndVerifyBooking = (requestFunction, searchParam) => {
+    let bookingData = getBookingData();
+    createBooking(bookingData).then(response => {
+        expect(response.status).to.eq(200);
+        let bookingID = Cypress.env('responses')[0].bookingid;
+        let bookingObject = { "bookingid": bookingID };
+        cy.log(`Booking ID: ${bookingID}`);
 
+        // Verify the booking based on the parameter
+        requestFunction(searchParam).then(response => {
+            expect(response.status).to.eq(200);
+            expect(response.body).deep.include(bookingObject);
+        });
+    });
+};
 
 describe('Tests for GET Bookings endpoints', () => {
+
     it('Positive: Get bookings data', () => {
-        let bookingData = getBookingData();
-        createBooking(bookingData).then(response => {
-            expect(response.status).to.eq(200);
-            let bookingID = Cypress.env('responses')[0].bookingid;
-            let bookingObject = {
-                "bookingid":bookingID
-            }
-            cy.log(bookingID);
-            getBookingIds().then(response => {
-                expect(response.status).to.eq(200);
-                expect(response.body).deep.include(bookingObject);
-            })
-        })
-    })
+        createAndVerifyBooking(getBookingIds);
+    });
+
     it('Positive: Get bookings by firstname', () => {
-        let bookingData = getBookingData();
-        createBooking(bookingData).then(response => {
-            expect(response.status).to.eq(200);
-            let firstname = response.body.booking.firstname;
-            let bookingID = Cypress.env('responses')[0].bookingid;
-            let bookingObject = {
-                "bookingid":bookingID
-            }
-            getBookingByFirstname(firstname).then(response => {
-                expect(response.status).to.eq(200);
-                expect(response.body).deep.include(bookingObject);
-            })
-        })
-    })
+        createAndVerifyBooking(getBookingByFirstname, (bookingData) => bookingData.firstname);
+    });
+
     it('Positive: Get bookings by lastname', () => {
-        let bookingData = getBookingData();
-        createBooking(bookingData).then(response => {
-            expect(response.status).to.eq(200);
-            let lastname = response.body.booking.lastname;
-            let bookingID = Cypress.env('responses')[0].bookingid;
-            let bookingObject = {
-                "bookingid":bookingID
-            }
-            getBookingByLastname(lastname).then(response => {
-                expect(response.status).to.eq(200);
-                expect(response.body).deep.include(bookingObject);
-            })
-        })
-    })
+        createAndVerifyBooking(getBookingByLastname, (bookingData) => bookingData.lastname);
+    });
+
     it('Positive: Get bookings by checkin date', () => {
-        let bookingData = getBookingData();
-        createBooking(bookingData).then(response => {
-            expect(response.status).to.eq(200);
-            let checkin = response.body.booking.bookingdates.checkin;
-            let bookingID = Cypress.env('responses')[0].bookingid;
-            let bookingObject = {
-                "bookingid":bookingID
-            }
-            getBookingByCheckin(checkin).then(response => {
-                expect(response.status).to.eq(200);
-                expect(response.body).deep.include(bookingObject);
-            })
-        })
-    })
+        createAndVerifyBooking(getBookingByCheckin, (bookingData) => bookingData.bookingdates.checkin);
+    });
+
     it('Positive: Get bookings by checkout date', () => {
-        let bookingData = getBookingData();
-        createBooking(bookingData).then(response => {
-            expect(response.status).to.eq(200);
-            let checkout = response.body.booking.bookingdates.checkout;
-            let bookingID = Cypress.env('responses')[0].bookingid;
-            let bookingObject = {
-                "bookingid":bookingID
-            }
-            getBookingByCheckout(checkout).then(response => {
-                expect(response.status).to.eq(200);
-                expect(response.body).deep.include(bookingObject);
-            })
-        })
-    })
-})
+        createAndVerifyBooking(getBookingByCheckout, (bookingData) => bookingData.bookingdates.checkout);
+    });
+});
