@@ -1,8 +1,6 @@
 import {createBooking, getBookingById} from "../../service/bookingService"
 import {getBookingData} from "../../helper/dataGenerator"
 
-
-
 describe('Tests for GET Booking by ID endpoints', () => {
     it('Positive: Get booking by ID', () => {
         let bookingData = getBookingData()

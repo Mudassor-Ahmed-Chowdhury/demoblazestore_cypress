@@ -1,58 +1,42 @@
-import {createBooking, getBookingById, deleteBooking} from "../../service/bookingService"
-import {getBookingData} from "../../helper/dataGenerator"
+import { createBooking, deleteBooking } from "../../service/bookingService";
+import { getBookingData } from "../../helper/dataGenerator";
 import { faker } from '@faker-js/faker';
 
 describe('Tests for DELETE Booking endpoint', () => {
+    const performDeleteBooking = (bookingDataId, expectedStatus, message) => {
+        deleteBooking(bookingDataId).then(response => {
+            expect(response.status).to.eq(expectedStatus, message);
+        });
+    };
+
     let bookingData = getBookingData();
 
     it('Positive: Delete booking', () => {
-        createBooking(bookingData).then(response => {
-            let bookingDataId = Cypress.env('responses')[0].bookingid;
-            deleteBooking(bookingDataId).then(response => {
-                //I would expect to see 204 - No content 
-                expect(response.status).to.eq(201, 'OK');
-            })
-        })
-    })
+        createBooking(bookingData).then(() => {
+            const bookingDataId = Cypress.env('responses')[0].bookingid;
+            performDeleteBooking(bookingDataId, 201, 'OK'); // Expecting 201 instead of 204 based on your comments
+        });
+    });
 
     it('Positive: Delete the same booking entity twice', () => {
-        createBooking(bookingData).then(response => {
-            let bookingDataId = Cypress.env('responses')[0].bookingid;
-            deleteBooking(bookingDataId).then(response => {
-                //I would expect to see 204 - No content 
-                expect(response.status).to.eq(201, 'OK');
-                deleteBooking(bookingDataId, false).then(response =>{
-                    //I would expect to see 404 - Not Found 
-                    expect(response.status).to.eq(405);
-                })
-            })
-        })
-    })
+        createBooking(bookingData).then(() => {
+            const bookingDataId = Cypress.env('responses')[0].bookingid;
+            performDeleteBooking(bookingDataId, 201, 'OK'); // First deletion
+            performDeleteBooking(bookingDataId, 405, 'Method Not Allowed'); // Second deletion (should return 405)
+        });
+    });
 
     it('Negative: Delete nonexistent booking entity', () => {
-        let bookingDataId = "1123";
-        deleteBooking(bookingDataId, false).then(response => {
-            console.log(response)
-            //I would expect to see 404 - Not Found 
-            expect(response.status).to.eq(405, 'Method Not Allowed');
-        })
-    })
+        const nonexistentBookingId = "1123";
+        performDeleteBooking(nonexistentBookingId, 405, 'Method Not Allowed');
+    });
 
     it('Negative: Delete booking with invalid id - string instead of number', () => {
-        let bookingDataId = faker.commerce.product();
-        deleteBooking(bookingDataId, false).then(response => {
-            console.log(response)
-            expect(response.status).to.eq(405, 'Method Not Allowed');
-        })
-        
-    })
+        const invalidBookingId = faker.commerce.product();
+        performDeleteBooking(invalidBookingId, 405, 'Method Not Allowed');
+    });
 
     it('Negative: Delete booking without id', () => {
-        deleteBooking("", false).then(response => {
-            cy.log(response)
-            expect(response.status).to.eq(404, 'Not Found');
-        })
-    })
-
-
-})
+        performDeleteBooking("", 404, 'Not Found');
+    });
+});
